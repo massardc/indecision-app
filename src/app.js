@@ -21,11 +21,16 @@ const onFormSubmit = (e) => {
 const removeAll = () => {
   appObject.options = [];
   renderTemplate();
-}
+};
+
+const onMakeDecision = () => {
+  const randomNum = Math.floor(Math.random() * appObject.options.length);
+  const option = appObject.options[randomNum];
+  console.log('option =>', option);
+};
 
 const appRoot = document.getElementById('app');
 
-const numbers = [44, 103, 1000];
 
 // JSX - JavaScript XML
 const renderTemplate = () => {
@@ -34,7 +39,7 @@ const renderTemplate = () => {
       <h1>{appObject.title}</h1> 
       {appObject.subtitle && <p>{appObject.subtitle}</p>}
       <p>{appObject.options.length > 0 ? 'Here are your options' : 'No options'}</p>
-      <p>{appObject.options.length}</p>
+      <button disabled={appObject.options.length === 0} onClick={onMakeDecision}>What should I do?</button>
       <button onClick={removeAll}>Remove All</button>
       <ol>
         {
