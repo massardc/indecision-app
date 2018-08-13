@@ -3,50 +3,49 @@ console.log('App.js is running...');
 const appObject = {
   title: 'Indecision App',
   subtitle: 'Helps you decide what to do.',
-  options: ['One', 'Two']
+  options: []
 }
-// JSX - JavaScript XML
-const template = (
-  <div>
-    <h1>{appObject.title}</h1> 
-    {appObject.subtitle && <p>{appObject.subtitle}</p>}
-    <p>{appObject.options.length > 0 ? 'Here are your options' : 'No options'}</p>
-    <ol>
-      <li>Item one</li>
-      <li>Item two</li>
-    </ol>
-  </div>
-);
 
-let count = 0;
-const addOne = () => {
-  count++;
-  renderCounterApp();
-};
-const subtractOne = () => {
-  if (count > 0) {
-    count--;
-    renderCounterApp();
+const onFormSubmit = (e) => {
+  e.preventDefault();
+
+  const option = e.target.elements.option.value;
+
+  if (option) {
+    appObject.options.push(option);
+    e.target.elements.option.value = '';
+    renderTemplate();
   }
 };
-const reset = () => {
-  count = 0;
-  renderCounterApp();
-};
+
+const removeAll = () => {
+  appObject.options = [];
+  renderTemplate();
+}
 
 const appRoot = document.getElementById('app');
 
-const renderCounterApp = () => {
-  const templateTwo = (
+// JSX - JavaScript XML
+const renderTemplate = () => {
+  const template = (
     <div>
-      <h1>Count: {count}</h1>
-      <button onClick={subtractOne}>-1</button>
-      <button onClick={addOne}>+1</button>
-      <button onClick={reset}>Reset</button>
+      <h1>{appObject.title}</h1> 
+      {appObject.subtitle && <p>{appObject.subtitle}</p>}
+      <p>{appObject.options.length > 0 ? 'Here are your options' : 'No options'}</p>
+      <p>{appObject.options.length}</p>
+      <button onClick={removeAll}>Remove All</button>
+      <ol>
+        <li>Item one</li>
+        <li>Item two</li>
+      </ol>
+      <form onSubmit={onFormSubmit}>
+        <input type="text" name="option"/>
+        <button>Add Option</button>
+      </form>
     </div>
   );
-
-  ReactDOM.render(templateTwo, appRoot);
+  
+  ReactDOM.render(template, appRoot);
 };
 
-renderCounterApp();
+renderTemplate();
