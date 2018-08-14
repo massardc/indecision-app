@@ -2,18 +2,20 @@ class IndecisionApp extends React.Component {
   constructor (props) {
     super(props);
     this.handleDeleteOptions = this.handleDeleteOptions.bind(this);
+    this.handleDeleteSingleOption = this.handleDeleteSingleOption.bind(this);
     this.handlePick = this.handlePick.bind(this);
     this.handleAddOption = this.handleAddOption.bind(this);
     this.state = {
-      options: []
+      options: props.options
     };
   }
   handleDeleteOptions() {
-    this.setState(() => {
-      return {
-        options: []
-      };
-    });
+    this.setState(() => ({ options: [] }));
+  }
+  handleDeleteSingleOption(optionToRemove) {
+    this.setState((prevState) => ({
+      options: prevState.options.filter(option => option !== optionToRemove)
+    }));
   }
   handlePick() {
     const randomNumber = Math.floor(Math.random() * this.state.options.length);
@@ -27,19 +29,18 @@ class IndecisionApp extends React.Component {
       return 'Item already exists.';
     }
 
-    this.setState((prevState) => {
-      return {
-        options: prevState.options.concat(option)
-      };
-    });
+    this.setState((prevState) => ({ 
+      options: prevState.options.concat(option) 
+    }));
   }
   render() {
-    const title = 'Indecision';
     const subtitle = 'Put your life in the hands of a computer';
 
     return (
       <div>
-        <Header title={title} subtitle={subtitle} />
+        <Header 
+          subtitle={subtitle} 
+        />
         <Action 
           hasOptions={this.state.options.length > 0}
           handlePick={this.handlePick}  
@@ -47,6 +48,7 @@ class IndecisionApp extends React.Component {
         <Options 
           options={this.state.options}
           handleDeleteOptions={this.handleDeleteOptions}
+          handleDeleteSingleOption={this.handleDeleteSingleOption}
         />
         <AddOption 
           handleAddOption={this.handleAddOption}  
@@ -56,14 +58,26 @@ class IndecisionApp extends React.Component {
   }
 }
 
+// Default props for Header component
+IndecisionApp.defaultProps = {
+  options: []
+};
+
 // Stateless functional components
 const Header = (props) => {
   return (
     <div>
       <h1>{props.title}</h1>
-      <h2>{props.subtitle}</h2>
+      {props.subtitle &&
+        <h2>{props.subtitle}</h2>
+      }
     </div>
   );
+};
+
+//   Default props for Header component
+Header.defaultProps = {
+  title: 'Indecision'
 };
 
 const Action = (props) => {
@@ -83,9 +97,14 @@ const Options = (props) => {
     <div>
       <button onClick={props.handleDeleteOptions}>Remove All</button>
       {
-        props.options.map((option) => <Option key={option} optionText={option} />)
+        props.options.map((option) => (
+          <Option 
+            key={option} 
+            optionText={option} 
+            handleDeleteSingleOption={props.handleDeleteSingleOption}  
+          />
+        ))
       }
-      <Option />
     </div>
   );
 };
@@ -93,7 +112,15 @@ const Options = (props) => {
 const Option = (props) => {
   return (
     <div>
-      <p>{props.optionText}</p>
+      <p>
+        {props.optionText}
+        <button 
+          onClick={(e) => {
+            props.handleDeleteSingleOption(props.optionText)
+          }}>
+          Remove
+        </button>  
+        </p>
     </div>
   );
 };
@@ -114,9 +141,7 @@ class AddOption extends React.Component {
     const error = this.props.handleAddOption(option);
     e.target.elements.option.value = '';
 
-    this.setState(() => {
-      return {error}
-    });
+    this.setState(() => ({ error }));
   }
   render() {
     return (
